@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Tag(models.Model):
+class Heading(models.Model):
     name = models.CharField(max_length=32, default='Разное', verbose_name='Название рубрики')
 
     class Meta:
@@ -17,7 +17,7 @@ class Article(models.Model):
     text = models.TextField(verbose_name='Текст')
     published_at = models.DateTimeField(verbose_name='Дата публикации')
     image = models.ImageField(null=True, blank=True, verbose_name='Изображение',)
-    scopes = models.ManyToManyField(Tag, related_name='articles', through='RelationShip')
+    headings = models.ManyToManyField(Heading, related_name='articles', through='HeadingArticle')
 
     class Meta:
         verbose_name = 'Статья'
@@ -28,11 +28,15 @@ class Article(models.Model):
         return self.title
 
 
-class RelationShip(models.Model):
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='relationships')
-    heading = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name='relationships', verbose_name='Выбор рубрики',)
+class HeadingArticle(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='scopes')
+    tag = models.ForeignKey(Heading, on_delete=models.CASCADE, related_name='groups', verbose_name='Выбор рубрики',)
     is_main = models.BooleanField(default=False, verbose_name='Основная рубрика')
 
     class Meta:
         verbose_name = 'Рубрика'
         verbose_name_plural = 'РУБРИКИ'
+
+    def __str__(self):
+        return f'{self.tag.name}'
+
