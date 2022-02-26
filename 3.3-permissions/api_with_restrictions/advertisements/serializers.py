@@ -42,8 +42,9 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         adv_set_status = Advertisement.objects.filter(status='OPEN')
         adv_creator = self.context['request'].user
         partial_update = self.context['view'].action == 'partial_update'
+        create = self.context['view'].action == 'create'
 
-        if len(adv_set_status.filter(creator=adv_creator, status='OPEN')) >= 10 and not partial_update:
+        if len(adv_set_status.filter(creator=adv_creator, status='OPEN')) >= 10 and (create or not partial_update):
             raise ValidationError('Превышен лимит в 10 объявлений')
 
         return data
